@@ -1,0 +1,25 @@
+#!/bin/bash
+# Asher Bond 2011 
+# ep-gitstrapped
+# Configuration Manager: elastic provisioner runtime bootstrapper
+# License: AGPL v3
+# assumes Ubuntu 10.04 LTS pristine system imagery (tested on 10.04.3)
+
+# USAGE='ep-gitstrapped [package1 package2 package3]'
+
+# change this to your elastic provisioner repo if you want
+ep_repo='https://gitstrapped.elasticprovisioner.com'
+
+# rely on apt for package management, but not too much
+apt-get update
+apt-get -y upgrade
+
+# at this point we should have the generic kernel upgraded
+
+# now lets pull from some repos
+apt-get install -y git-core curl
+
+while [ ! -z "$1" ]; do
+bash < <(curl -s -k -B "$ep_repo/$1")
+shift
+done

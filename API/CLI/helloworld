@@ -1,0 +1,6 @@
+#!/bin/bash
+# Asher Bond 2011
+# Git Strapped hello world
+
+echo  "git strapped and/or get served"
+
