@@ -4,8 +4,8 @@
 # Configuration Manager: elastic provisioner runtime bootstrapper
 # License: AGPL v3
 # assumes Ubuntu 10.04 LTS pristine system imagery (tested on 10.04.3)
+# SYNTAX: ep-gitstrapped <strap>
 
-# USAGE='ep-gitstrapped [package1 package2 package3]'
 
 # change this to your elastic provisioner repo if you want
 ep_repo='https://gitstrapped.elasticprovisioner.com'
@@ -22,7 +22,5 @@ apt-get install -y git-core curl
 strap=$1
 shift
 
-while [ ! -z "$1" ]; do
 bash < <(curl -s -k -B "$ep_repo/$strap $*")
-shift
-done
+
