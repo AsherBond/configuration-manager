@@ -23,6 +23,6 @@ strap=$1
 shift
 
 if [ -z $1];then
-	curl "$ep_repo/$strap" | bash -s $*
-else	curl "$ep_repo/$strap" | bash
+	curl -s -k -B "$ep_repo/$strap" | bash -s $*
+else	curl -s -k -B "$ep_repo/$strap" | bash
 fi
