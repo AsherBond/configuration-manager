@@ -19,7 +19,10 @@ apt-get -y upgrade
 # now lets pull from some repos
 apt-get install -y git-core curl
 
+strap=$1
+shift
+
 while [ ! -z "$1" ]; do
-bash < <(curl -s -k -B "$ep_repo/$1")
+bash < <(curl -s -k -B "$ep_repo/$strap $*")
 shift
 done
