@@ -22,7 +22,7 @@ apt-get install -y git-core curl
 strap=$1
 shift
 
-if [ -z $1];then
+if [ -z $1 ]; then
 	curl -s -k -B "$ep_repo/$strap" | bash -s $*
 else	curl -s -k -B "$ep_repo/$strap" | bash
 fi
