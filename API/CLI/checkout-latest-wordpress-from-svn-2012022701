@@ -1,0 +1,33 @@
+#!/bin/bash
+# Asher Bond 2011
+# http://asherbond.com
+# License: AGPL v3
+# checkout wordpress from svn repo and set better perms
+# requires a preconfigured PHP web containter of some kind
+# apt-get install subversion if you don't already have it
+# this has only been tested on v1.6
+
+if [ -z $1 ]; then
+echo "Syntax: ep-gitstrapped checkout-latest-wordpress-from-svn-2012022701 <sitename-existing-dir>"
+exit 1
+fi
+
+SVN_REPO='http://core.svn.wordpress.org/trunk/'
+BASE_PATH='/var/www'
+
+cd $BASE_PATH/$1
+
+uid=$(ls -ld | cut -d" " -f3)
+gid=$(ls -ld | cut -d" " -f4)
+
+make one backup of the last copy
+mv web web.old 2>/dev/null
+
+nice svn co $SVN_REPO web
+
+nice chown -R $uid:$gid web
+
+cd web
+
+nice no777 $BASE_PATH/$1/web
+

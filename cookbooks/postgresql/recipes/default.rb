@@ -2,34 +2,19 @@
 # Cookbook Name:: postgresql
 # Recipe:: default
 #
-# Copyright 2011, VMware
+# Copyright 2009, Opscode, Inc.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-%w[libpq-dev postgresql].each do |pkg|
-  package pkg
-end
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-case node['platform']
-when "ubuntu"
-  ruby_block "postgresql_conf_update" do
-    block do
-      / \d*.\d*/ =~ `pg_config --version`
-      pg_major_version = $&.strip
-
-      # update postgresql.conf
-      postgresql_conf_file = File.join("", "etc", "postgresql", pg_major_version, "main", "postgresql.conf")
-      `grep "^\s*listen_addresses" #{postgresql_conf_file}`
-      if $?.exitstatus != 0
-        `echo "listen_addresses='#{node[:postgresql][:host]},localhost'" >> #{postgresql_conf_file}`
-      else
-        `sed -i.bkup -e "s/^\s*listen_addresses.*$/listen_addresses='#{node[:postgresql][:host]},localhost'/" #{postgresql_conf_file}`
-      end
-
-      # Cant use service resource as service name needs to be statically defined
-      `#{File.join("", "etc", "init.d", "postgresql-#{pg_major_version}")} restart`
-    end
-  end
-else
-  Chef::Log.error("Installation of PostgreSQL is not supported on this platform.")
-end
+include_recipe "postgresql::client"

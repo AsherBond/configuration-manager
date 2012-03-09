@@ -1,6 +1,12 @@
-maintainer       "VMware"
-maintainer_email "support@vmware.com"
-license          "Apache 2.0"
-description      "Installs/Configures Erlang"
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
-version          "0.0.1"
+maintainer        "Opscode, Inc."
+maintainer_email  "cookbooks@opscode.com"
+license           "Apache 2.0"
+description       "Installs erlang, optionally install GUI tools."
+version           "1.0.0"
+depends           "yum", ">= 0.5.0"
+
+recipe "erlang", "Installs erlang"
+
+%w{ ubuntu debian redhat centos scientific }.each do |os|
+  supports os
+end

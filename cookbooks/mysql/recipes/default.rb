@@ -2,38 +2,19 @@
 # Cookbook Name:: mysql
 # Recipe:: default
 #
-# Copyright 2011, VMware
+# Copyright 2008-2009, Opscode, Inc.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
-case node['platform']
-when "ubuntu"
-  package "mysql-client"
-
-  bash "Setup mysql" do
-    code <<-EOH
-    echo mysql-server-5.1 mysql-server/root_password select #{node[:mysql][:server_root_password]} | debconf-set-selections
-    echo mysql-server-5.1 mysql-server/root_password_again select #{node[:mysql][:server_root_password]} | debconf-set-selections
-    EOH
-    not_if do
-      ::File.exists?(File.join("", "usr", "sbin", "mysqld"))
-    end
-  end
-
-  package "mysql-server"
-
-  template File.join("", "etc", "mysql", "my.cnf") do
-    source "ubuntu.cnf.erb"
-    owner "root"
-    group "root"
-    mode "0600"
-    notifies :restart, "service[mysql]"
-  end
-
-  service "mysql" do
-    supports :status => true, :restart => true, :reload => true
-    action [ :enable, :start ]
-  end
-else
-  Chef::Log.error("Installation of mysql not supported on this platform.")
-end
+include_recipe "mysql::client"

@@ -1,39 +1,39 @@
-#
 # Cookbook Name:: erlang
 # Recipe:: default
+# Author:: Joe Williams <joe@joetify.com>
+# Author:: Matt Ray <matt@opscode.com>
 #
-# Copyright 2011, VMware
+# Copyright 2008-2009, Joe Williams
+# Copyright 2011, Opscode Inc.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-%w[ build-essential libncurses5-dev openssl libssl-dev ].each do |pkg|
-  package pkg
-end
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-remote_file File.join("", "tmp", "otp_src_#{node[:erlang][:version]}.tar.gz") do
-  owner node[:deployment][:user]
-  source node[:erlang][:source]
-  not_if { ::File.exists?(File.join("", "tmp", "otp_src_#{node[:erlang][:version]}.tar.gz")) }
-end
-
-directory node[:erlang][:path] do
-  owner node[:deployment][:user]
-  group node[:deployment][:group]
-  mode "0755"
-  recursive true
-  action :create
-end
-
-bash "Install Erlang" do
-  cwd File.join("", "tmp")
-  user node[:deployment][:user]
-  code <<-EOH
-  tar xvzf otp_src_#{node[:erlang][:version]}.tar.gz
-  cd otp_src_#{node[:erlang][:version]}
-  #{File.join(".", "configure")} --prefix=#{node[:erlang][:path]}
-  make
-  make install
-  EOH
-  not_if do
-    ::File.exists?(File.join(node[:erlang][:path], "bin", "erl"))
+case node[:platform]
+when "debian", "ubuntu"
+  erlpkg = node[:erlang][:gui_tools] ? "erlang" : "erlang-nox"
+  package erlpkg
+  package "erlang-dev"
+when "redhat", "centos", "scientific"
+  include_recipe "yum::epel"
+  yum_repository "erlang" do
+    name "EPELErlangrepo"
+    url "http://repos.fedorapeople.org/repos/peter/erlang/epel-5Server/$basearch"
+    description "Updated erlang yum repository for RedHat / Centos 5.x - #{node['kernel']['machine']}"
+    action :add
+    only_if { node[:platform_version].to_f >= 5.0 && node[:platform_version].to_f < 6.0 }
   end
+  package "erlang"
+else
+  package "erlang"
 end

@@ -1,0 +1,59 @@
+#!/bin/bash
+# Asher Bond 2011
+# Elastic Provisioner, Inc.
+# This installation software is licensed under AGPL v3
+# heavily based on a post by Juan Negron // September 10th, 2011
+# Original Source: http://cloud.ubuntu.com/2011/09/from-zero-to-drawbridge-via-ubuntu-server-ensemble-and-cloudfoundry-in-less-than-10-minutes/
+
+# Dependencies
+sudo apt-get install bzr wget grep sed gawk
+
+# Ensemble
+sudo apt-add-repository ppa:ensemble/ppa
+sudo apt-get update
+sudo apt-get install ensemble
+
+# Formulas and supporting scripts
+bzr branch lp:~canonical-sig/+junk/cloudfoundry-server
+bzr branch lp:~canonical-sig/+junk/cloudfoundry-server-dea
+bzr branch lp:~canonical-sig/+junk/cf-mysql
+bzr branch lp:~canonical-sig/+junk/cf-mongodb
+bzr branch lp:~canonical-sig/+junk/cf-redis
+bzr branch lp:~kirkland/+junk/drawbridge
+bzr branch lp:~negronjl/+junk/ubuntu-latest-image
+chmod +x ./ubuntu-latest-image
+ensemble
+echo "    default-image-id: `ubuntu-latest-image oneiric m1.large | grep Image | awk '{ print $3 }'`" >> ~/.ensemble/environments.yaml
+echo "    default-instance-type: m1.large" >> ~/.ensemble/environments.yaml
+
+# Bootstrap
+ensemble bootstrap
+
+# Deploy
+ensemble deploy --repository . cloudfoundry-server
+ensemble deploy --repository . cloudfoundry-server-dea
+ensemble deploy --repository . cf-mysql
+ensemble deploy --repository . cf-redis
+ensemble deploy --repository . cf-mongodb
+
+# Relationships
+ensemble add-relation cloudfoundry-server cloudfoundry-server-dea
+ensemble add-relation cloudfoundry-server cf-mysql
+ensemble add-relation cloudfoundry-server cf-mongodb
+ensemble add-relation cloudfoundry-server cf-redis
+
+# Scale
+ensemble add-unit cloudfoundry-server-dea
+ensemble add-unit cf-mysql
+ensemble add-unit cf-mongodb
+ensemble add-unit cf-redis
+
+# DrawBridge
+# cd drawbridge
+# vmc
+# vmc target <your hostname here>
+# vmc add-user
+# vmc push
+
+# Take it all down
+# ensemble destroy-environment

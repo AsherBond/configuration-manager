@@ -1,0 +1,25 @@
+#!/bin/bash
+# Asher Bond 2011
+# http://asherbond.com
+# License: AGPL v3
+# bootstrap w3-total cache from svn
+
+if [ -z $1 ]; then
+echo "Syntax: ep-gitstrapped bootstrap-w3-total-cache-from-svn-2012021602 <wp-plugin-path>"
+exit 1
+fi
+
+SVN_REPO='http://plugins.svn.wordpress.org/w3-total-cache/trunk'
+
+cd $1
+
+uid=$(ls -ld | cut -d" " -f3)
+gid=$(ls -ld | cut -d" " -f4)
+
+nice svn co $SVN_REPO w3-total-cache
+
+nice chown -R $uid:$gid w3-total-cache
+
+nice no777 w3-total-cache
+
+
