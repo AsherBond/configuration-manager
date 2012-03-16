@@ -2,6 +2,7 @@
 # Asher Bond 2011 
 # ep-gitstrapped
 # Configuration Manager: elastic provisioner runtime bootstrapper
+# "A loaded gun without a waiting period" - @ElasticYotta
 # License: AGPL v3
 # assumes Ubuntu 10.04 LTS pristine system imagery (tested on 10.04.3)
 # SYNTAX: ep-gitstrapped <strap>
