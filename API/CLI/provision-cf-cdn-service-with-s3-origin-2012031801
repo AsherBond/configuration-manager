@@ -1,0 +1,75 @@
+#!/bin/bash
+# @AsherBond, @ElasticYotta, @GitStrapped 2012
+# http://elasticyotta.net
+# http://gitstrapped.com
+# License: AGPL v3
+# Preconditions and Requirements:
+# 1. AWS CloudFront account access configured in s3cmd.
+# 2. S3 bit bucket account access configured in s3cmd.
+#
+# Expected Behaviour:
+# 1. Provisions an s3 bit bucket if it doesn't already exist
+# 2. Associates a cloudfront distribution to the bucket
+# 3. Optionally configures canonical names (CNAMEs) to be used publicly with CDN
+
+if [ -z $1 ]; then
+echo "Syntax: ep-gitstrapped bootstrap-magento-v1.7-from-svn-2012031701 <dev2.example.com>"
+exit 1
+fi
+
+SVN_REPO='http://svn.magentocommerce.com/source/branches/1.7'
+BASE_PATH='/var/www'
+
+cd $BASE_PATH/$1
+
+uid=$(ls -ld | cut -d" " -f3)
+gid=$(ls -ld | cut -d" " -f4)
+
+make one backup of the last copy
+mv web web.old 2>/dev/null
+
+nice svn co $SVN_REPO web
+
+nice chown -R $uid:$gid web
+
+cd web
+
+nice no777 $BASE_PATH/$1/web
+
+chmod 770 app/etc
+chmod 770 var
+chmod 770 media
+chmod 770 var/package
+chmod 770 media/customer
+chmod 660 var/package/Mage_Core_Modules-1.6.1.0.xml
+chmod 770 media/import
+chmod 660 var/package/Lib_LinLibertineFont-2.8.14.0.xml
+chmod 770 media/downloadable
+chmod 660 var/package/Find_Feed-1.1.0.xml
+chmod 770 media/xmlconnect
+chmod 660 var/package/Mage_Core_Adminhtml-1.6.1.0.xml
+chmod 770 media/xmlconnect/custom
+chmod 660 var/package/Lib_Phpseclib-1.5.0.0.xml
+chmod 660 media/xmlconnect/custom/ok.gif
+chmod 660 var/package/Lib_ZF_Locale-1.11.1.0.xml
+chmod 770 media/xmlconnect/themes
+chmod 660 var/package/Lib_Varien-1.6.1.0.xml
+chmod 770 media/xmlconnect/original
+chmod 660 var/package/Interface_Frontend_Base_Default-1.6.1.0.xml
+chmod 660 media/xmlconnect/original/ok.gif
+chmod 660 var/package/Lib_Js_Prototype-1.7.0.0.2.xml
+chmod 770 media/xmlconnect/system
+chmod 660 var/package/Lib_Js_TinyMCE-3.3.7.0.xml
+chmod 660 media/xmlconnect/system/ok.gif
+chmod 660 var/package/Lib_Google_Checkout-1.5.0.0.xml
+chmod 660 var/package/Lib_Js_Ext-1.6.0.0.xml
+chmod 660 var/package/Interface_Adminhtml_Default-1.6.1.0.xml
+chmod 660 var/package/Mage_All_Latest-1.6.1.0.xml
+chmod 660 var/package/Lib_Js_Calendar-1.51.1.xml
+chmod 660 var/package/Mage_Locale_en_US-1.6.1.0.xml
+chmod 660 var/package/Mage_Compiler-1.6.0.0.xml
+chmod 660 var/package/Mage_Centinel-1.6.1.0.xml
+chmod 660 var/package/Lib_Js_Mage-1.6.1.0.xml
+chmod 660 var/package/*.xml
+chmod 770 var/connect
+
