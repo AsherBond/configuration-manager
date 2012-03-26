@@ -1,0 +1,17 @@
+#!/bin/bash
+# Asher Bond
+# @ElasticYotta
+# source@elasticprovisioner.com
+# uses a pseudorandom device to grab some pseudorandom stuff
+# nothingsrandom
+
+
+skintax="$0 <num chars> <num results>"
+
+if [ -z $2 ]; then
+print $skintax;
+exit;
+fi
+
+cat /dev/urandom| tr -dc 'a-zA-Z0-9' | fold -w $1 | head -n $2 
+
