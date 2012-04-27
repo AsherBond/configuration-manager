@@ -1,0 +1,25 @@
+#!/bin/bash
+# Asher Bond 2012 
+# ep-gitstrapped
+# Configuration Manager: elastic provisioner runtime bootstrapper
+# "A loaded gun without a waiting period" - @ElasticYotta
+# License: AGPL v3
+# SYNTAX: ep-gitstrapped <strap>
+
+# try to read the .gitstrapped config file if it exists
+~/.gitstrapped 2>/dev/null
+
+# change this to your elastic provisioner repo if you want
+ep_repo='https://gitstrapped.elasticprovisioner.com'
+
+
+# now lets pull from some repos
+#apt-get install -y git-core curl
+
+strap=$1
+shift
+
+if [ ! -z $1 ]; then
+	curl -s -k -B "$ep_repo/$strap" | bash -s $*
+else	curl -s -k -B "$ep_repo/$strap" | bash
+fi
