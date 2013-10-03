@@ -1,0 +1,14 @@
+#!/bin/bash
+# Asher Bond 2012
+# Elastic Provisioner, Inc.
+# Before you put on your shoes, @Gitstrapped.
+# A loaded gun without a waiting period.
+# License: AGPL v3
+
+if [ ! -r "/usr/local/bin/ep-gitstrapped" ]; then
+curl -s -k https://gitstrapped.elasticprovisioner.com/ep-gitstrapped-2012071301 > /usr/local/bin/ep-gitstrapped
+chmod 755 /usr/local/bin/ep-gitstrapped
+fi
+
+/usr/local/bin/ep-gitstrapped $STRAP $OPTIONS
+

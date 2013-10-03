@@ -1,22 +1,62 @@
-#!/bin/bash
+#!/bin/bash 
 # Asher Bond 2012 
-# ep-gitstrapped
+# http://gitstrapped.elasticprovisioner.com/ep-gitstrapped-2012071301
 # Configuration Manager: elastic provisioner runtime bootstrapper
 # "A loaded gun without a waiting period" - @ElasticYotta
 # License: AGPL v3
-# SYNTAX: ep-gitstrapped <strap>
+
+# defaults
+export STRAP_CACHE='/var/cache/gitstrapped'
+export STRAP_DIR_PERMS=330
+export STRAP_PERMS=550
+SYNTAX='ep-gitstrapped <strap>'
+
+if [ -z "$1" ]; then
+	echo "$SYNTAX"
+	exit
+fi
 
 # try to read the .gitstrapped config file if it exists
-~/.gitstrapped 2>/dev/null
+# (may override defaults)
+if [ -x ~/.gitstrapped ]; then
+	. ~/.gitstrapped
+fi
 
-# change this to your elastic provisioner repo if you want
+# change this to your elastic provisioner implementation if you want
 ep_repo='https://gitstrapped.elasticprovisioner.com'
 
-
-strap=$1
+strap="$1"
 shift
 
-if [ ! -z $1 ]; then
-	curl -s -k -B "$ep_repo/$strap" | bash -s $*
-else	curl -s -k -B "$ep_repo/$strap" | bash
+# if we already have it in the local cache just run it from the local cache
+if [ -x $STRAP_CACHE/$strap ]; then
+	$STRAP_CACHE/$strap $@
+	exit
 fi
+
+if [ "$strap" = "cat" ]; then
+	strap=$1
+	shift
+	curl -s -k -B "$ep_repo/$strap"
+	exit
+fi
+
+# create the strap cache if it doesn't exist.
+if [ ! -e $STRAP_CACHE ]; then
+	mkdir -p $STRAP_CACHE && chmod $STRAP_DIR_PERMS $STRAP_CACHE
+fi
+
+# cache the strap locally if we have the proper permissions
+# except for cases where the remote "strap" is dynamic
+if [ -w $STRAP_CACHE ] && ( echo $strap | grep -qe '-[0-9]\{10\}$' ) ; then
+	curl -s -k -B "$ep_repo/$strap" > "$STRAP_CACHE/$strap" && chmod $STRAP_PERMS "$STRAP_CACHE/$strap"
+	$STRAP_CACHE/$strap $@
+	exit
+fi
+
+
+if [ ! -z "$1" ]; then
+	curl -s -k -B "$ep_repo/$strap" | bash -s "$@"
+else	curl -s -k -B "$ep_repo/$strap" | bash 
+fi
+
